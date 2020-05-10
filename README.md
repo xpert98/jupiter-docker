@@ -11,6 +11,7 @@ These utilities are available to initialize a Docker Swarm environment for the J
 1. Copy jupiter_init.py and docker-compose.yaml.template to the Docker host
 1. Run the jupiter_init.py script, providing a version for the deployments/secrets
    * `jupiter_init.py -v 1`
+   * Take note of database credentials and JWT bearer tokens that were generated - they're only shown once
    * A docker-compose.yaml file should be generated
 1. Deploy the Swarm stack
    * `sudo docker stack deploy jupiter -c docker-compose.yaml`
