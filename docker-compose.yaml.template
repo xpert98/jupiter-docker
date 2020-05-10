@@ -1,0 +1,115 @@
+version: "3.5"
+
+volumes:
+        mongo-data:
+        init-mongo.js:
+        cis-data:
+        imc-data:
+
+services:
+        mongo:
+                image: "mongo"
+                environment:
+                        MONGO_INITDB_DATABASE: jupiter
+                        MONGO_INITDB_ROOT_USERNAME: admin
+                        MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_root_password#
+                volumes:
+                 - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+                 - mongo-data:/data/db
+                ports:
+                 - 27017:27017
+                command: mongod --auth
+                secrets:
+                 - mongo_root_password#
+        postgres-cis:
+                image: "postgres"
+                environment:
+                        POSTGRES_USER: cis
+                        POSTGRES_PASSWORD_FILE: /run/secrets/cisdb_password#
+                        POSTGRES_DB: jupitercis
+                volumes:
+                 - cis-data:/var/lib/postgresql/data
+                ports:
+                 - 5432:5432
+                secrets:
+                 - cisdb_password#
+        postgres-imc:
+                image: "postgres"
+                environment:
+                        POSTGRES_USER: imc
+                        POSTGRES_PASSWORD_FILE: /run/secrets/imcdb_password#
+                        POSTGRES_DB: jupiterimc
+                volumes:
+                 - imc-data:/var/lib/postgresql/data
+                ports:
+                 - 5433:5432
+                secrets:
+                 - imcdb_password#
+        jupiter-cis:
+                image: "xpert98/jupiter-cis"
+                environment:
+                        PORT: 3000
+                        PG_HOST: jupiter_postgres-cis
+                        PG_PORT: 5432 
+                        PG_SCHEMA: jupitercis
+                        PG_USERNAME: cis
+                        PG_PASSWORD_FILE: /run/secrets/cisdb_password#
+                        JWT_SECRET_FILE: /run/secrets/cis_jwt_secret#
+                ports:
+                 - 3000:3000
+                secrets:
+                 - cisdb_password#
+                 - cis_jwt_secret#
+        jupiter-cs:
+                image: "xpert98/jupiter-cs"
+                environment:
+                        PORT: 3000
+                        MONGO_HOST: jupiter_mongo
+                        MONGO_PORT: 27017
+                        MONGO_COLLECTION: jupiter
+                        MONGO_USERNAME: jupiter
+                        MONGO_PASSWORD_FILE: /run/secrets/mongo_user_password#
+                        INSTANCE_ID_FILE: /run/secrets/cs_instance_id#
+                        JWT_SECRET_FILE: /run/secrets/cs_jwt_secret#
+                ports:
+                 - 3001:3000
+                secrets:
+                 - mongo_user_password#
+                 - cs_instance_id#
+                 - cs_jwt_secret#
+        jupiter-imc:
+                image: "xpert98/jupiter-imc"
+                environment:
+                        JUPITER_DB_HOST: jupiter_postgres-imc
+                        JUPITER_DB_PORT: 5433
+                        JUPITER_DB_SCHEMA: jupiterimc
+                        JUPITER_DB_USER: imc
+                        JUPITER_DB_PASSWORD_FILE: /run/secrets/imcdb_password#
+                        SECRET_KEY_FILE: /run/secrets/imc_secret_key#
+                        SECRET_IV_FILE: /run/secrets/imc_secret_iv#
+                ports:
+                 - 80:80
+                secrets:
+                 - imcdb_password#
+                 - imc_secret_key#
+                 - imc_secret_iv#
+          
+secrets:
+        mongo_root_password#:
+                external: true
+        mongo_user_password#:
+                external: true
+        cisdb_password#:
+                external: true
+        imcdb_password#:
+                external: true
+        cis_jwt_secret#:
+                external: true
+        cs_jwt_secret#:
+                external: true
+        cs_instance_id#:
+                external: true
+        imc_secret_key#:
+                external: true
+        imc_secret_iv#:
+                external: true
