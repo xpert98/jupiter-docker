@@ -8,7 +8,9 @@ These utilities are available to initialize a Docker Swarm environment for the J
 * Python 3.6.9
 
 ## Usage
-1. Copy jupiter_init.py and docker-compose.yaml.template to the Docker host
+1. Ensure your Docker host has Docker Swarm initialized
+1. Clone repo to the Docker host
+   `git clone https://github.com/xpert98/jupiter-docker.git`
 1. Run the jupiter_init.py script, providing a version for the deployments/secrets
    * `jupiter_init.py -v 1`
    * Take note of database credentials and JWT bearer tokens that were generated - they're only shown once
