@@ -3,9 +3,9 @@
 These utilities are available to initialize a Docker Swarm environment for the Jupiter Inventory Mangement Console, Jupiter Collector Service, Jupiter Curated Inventory Service, and their respective data stores as well as automatically generated credentials that are stored in Docker Secrets.
 
 ## Minimum Requirements
-* Docker 19.03.6
-* Docker Compose 1.17.1
-* Python 3.6.9
+* Docker
+* Docker Compose
+* Python 3.x
 
 ## Usage
 1. Ensure your Docker host has Docker Swarm initialized
